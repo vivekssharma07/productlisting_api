@@ -38,7 +38,7 @@ router.post('/addCategory' ,async (req,res) => {
   }
 })
 
-//Listing all categories and the associated products
+//Listing all categories and the associated products (2nd Task Logic)
 router.get('/getProducts',(req,res) => {
    try {
         Category.aggregate([
@@ -59,5 +59,19 @@ router.get('/getProducts',(req,res) => {
       res.status(422).send(err);
    }
 }) 
+
+//Send  deleted records as a response (3rd Task Logic )
+router.post('/deleteCategory',async (req,res) => {
+    const category_type = req.body.category_type;
+    
+    try {
+        await Category.findOneAndDelete({category_type:category_type});
+        const products = await Product.find({category : category_type });
+        await Product.deleteMany({category:category_type});
+        res.json({'DeletedProducts':products});
+    } catch (err) {
+        res.status(422).send(err);
+    }
+})
 
 module.exports = router;
